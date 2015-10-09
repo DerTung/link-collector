@@ -1,0 +1,19 @@
+{
+  "name": "LinkCollector",
+  "version": "0.0.1",
+  "description": "LinkCollector collects download links for all your favorite TV shows on warez-bb.org",
+  "author": {
+    "name": "Der Tung",
+    "email": "dertung@gmx.de"
+  },
+  "devDependencies": {
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.10",
+    "karma-browserify": "^4.4.0",
+    "karma-chrome-launcher": "^0.2.1",
+    "karma-fixture": "^0.2.5",
+    "karma-html2js-preprocessor": "^0.1.0",
+    "karma-jasmine": "^0.3.6",
+    "karma-jasmine-ajax": "^0.1.13"
+  }
+}

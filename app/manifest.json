@@ -1,0 +1,13 @@
+{
+  "manifest_version": 2,
+  "name": "LinkCollector",
+  "version": "0.0.1",
+
+  "default_locale": "en",
+  "description": "LinkCollector collects download links for all your favorite TV shows on warez-bb.org",
+  "author": "Der Tung <dertung@gmx.de>",
+
+  "icons": {
+    "128": "icon.png"
+  }
+}
