@@ -3,11 +3,18 @@
   "name": "LinkCollector",
   "version": "0.0.1",
 
-  "default_locale": "en",
   "description": "LinkCollector collects download links for all your favorite TV shows on warez-bb.org",
   "author": "Der Tung <dertung@gmx.de>",
 
   "icons": {
-    "128": "icon.png"
+    "128": "img/icon.png"
+  },
+
+  "browser_action": {
+    "default_icon": {
+      "38": "img/icon38.png" 
+    },
+    "default_title": "LinkCollector",
+    "default_popup": "popup/popup.html"
   }
 }

@@ -7,6 +7,8 @@
     "email": "dertung@gmx.de"
   },
   "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-browserify": "^0.5.1",
     "jasmine-core": "^2.3.4",
     "karma": "^0.13.10",
     "karma-browserify": "^4.4.0",
