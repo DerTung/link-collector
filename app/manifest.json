@@ -14,7 +14,19 @@
     "default_icon": {
       "38": "img/icon38.png" 
     },
-    "default_title": "LinkCollector",
-    "default_popup": "popup/popup.html"
-  }
+    "default_title": "LinkCollector"
+  },
+
+  "background": {
+    "scripts": ["background/background.js"]
+  },
+
+  "content_scripts": [{
+    "matches": ["https://www.warez-bb.org/viewtopic.php?t=*"],
+    "js": ["content/content.js"]
+  }],
+
+  "permissions": [
+    "https://www.warez-bb.org/"
+  ]
 }

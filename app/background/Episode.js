@@ -1,22 +1,22 @@
 function Episode(season, episode) {
-  this._season = season;
-  this._episode = episode; 
-  this._files = [];
+  this.season = season;
+  this.episode = episode; 
+  this.files = [];
 }
 
 Episode.prototype.equals = function(other) {
-  return !!other && this._season === other._season && this._episode === other._episode;
+  return !!other && this.season === other.season && this.episode === other.episode;
 };
 
 Episode.prototype.toString = function() {
   function pad(number) {
     return number < 10 ? '0' + number : '' + number;  
   }
-  return 'S' + pad(this._season) + 'E' + pad(this._episode); 
+  return 'S' + pad(this.season) + 'E' + pad(this.episode); 
 }
 
 Episode.prototype.addFile = function(file) {
-  this._files.push(file);
+  this.files.push(file);
 }
 
 Episode.fromElement = function(element) {

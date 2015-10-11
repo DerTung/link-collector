@@ -1,0 +1,11 @@
+li {
+  list-style-type: none;
+}
+
+ul {
+  -webkit-padding-start: 10px;
+}
+
+#links {
+  font-family: monospace;
+}

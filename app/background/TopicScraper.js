@@ -15,9 +15,7 @@ TopicScraper.prototype.analyze = function(html) {
   var message = this._getFirstMessage(doc);
   this._analyzeMessage(message);
 
-  return {
-    episodes: this._episodes
-  }
+  return this._episodes
 };
 
 TopicScraper.prototype._getFirstMessage = function(doc) {

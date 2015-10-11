@@ -1,0 +1,23 @@
+
+{{#shows}}
+  <div class="show">
+    <div class="episodes">
+    {{#episodes.length}}
+    <b>{{ title }}</b>
+    {{/episodes.length}}
+    <ul>
+    {{#episodes}}
+      <li class="episode">
+        s{{ season }}e{{ episode }}
+        <ul>
+        {{#files}}
+          {{#links}}
+            <li>{{ link }}</li>
+          {{/links}}
+        {{/files}}
+        </ul>
+      </li>
+    {{/episodes}}
+    </ul>
+  </div>
+{{/shows}}

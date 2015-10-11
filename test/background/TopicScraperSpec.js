@@ -38,12 +38,12 @@ describe('TopicScraper', function() {
     });
 
     it('extracts episode information', function() {
-      expect(data.episodes.length).toBe(3);
-      expect(data.episodes.toString()).toEqual('S06E03,S07E02,S06E01');
+      expect(data.length).toBe(3);
+      expect(data.toString()).toEqual('S06E03,S07E02,S06E01');
     });
 
     it('extracts file information', function() {
-      var files = data.episodes[0]._files;
+      var files = data[0].files;
       expect(files.length).toBe(2);
       expect(files[0]).toEqual(jasmine.objectContaining({
         format: 'MP4',
@@ -56,7 +56,7 @@ describe('TopicScraper', function() {
     });
 
     it('extracts link information', function() {
-      var links = data.episodes[0]._files[0].links;
+      var links = data[0].files[0].links;
       expect(links.length).toBe(8);
       [{
         hoster: 'NF',

@@ -1,10 +1,12 @@
 var gulp = require('gulp');
 var KarmaServer = require('karma').Server;
-var browserify = require('gulp-browserify');
+var browserify = require('browserify');
+var mustache = require('browserify-mustache');
+var source = require('vinyl-source-stream');
 
 var paths = {
-  staticFiles: ['app/**/*png', 'app/**/*.json', 'app/**/*.html'],
-  jsFiles: ['app/**/*.js']
+  staticFiles: ['app/**/*png', 'app/**/*.json', 'app/**/*.html', 'app/**/*.css', 'app/content/content.js'],
+  browserify: ['app/**/*.js', 'app/**/*.mustache']
 }
 
 gulp.task('test', function (done) {
@@ -15,21 +17,35 @@ gulp.task('test', function (done) {
 });
 
 gulp.task('copy', function() {
-  gulp.src(paths.staticFiles).pipe(gulp.dest('build'));
+  gulp.src(paths.staticFiles, {base: 'app'}).pipe(gulp.dest('build'));
 });
 
-gulp.task('browserify', function() {
-  gulp.src('app/background/background.js')
-    .pipe(browserify({
-      insertGlobals : true,
-      debug : true
-    }))
-    .pipe(gulp.dest('./build/'))
+gulp.task('browserify-background', function() {
+  return browserify('./app/background/background.js', {
+    insertGlobals : true,
+    debug : true,
+    paths: ['./app/', './bower_components/'],    
+  }).bundle()
+    .pipe(source('background.js'))
+    .pipe(gulp.dest('./build/background'));
 });
 
-gulp.task('watch', function() {
+gulp.task('browserify-popup', function() {
+  return browserify('./app/popup/popup.js', {
+    insertGlobals : true,
+    debug : true,
+    paths: ['./app/', './bower_components/'],    
+  }).transform(mustache)
+    .bundle()
+    .pipe(source('popup.js'))
+    .pipe(gulp.dest('./build/popup/'));
+})
+
+gulp.task('browserify', ['browserify-background', 'browserify-popup']);
+
+gulp.task('watch', ['default'], function() {
   gulp.watch(paths.staticFiles, ['copy']);
-  gulp.watch(paths.jsFiles, ['browserify']);
+  gulp.watch(paths.browserify, ['browserify']);
 });
 
 gulp.task('default', ['test', 'copy', 'browserify']);
