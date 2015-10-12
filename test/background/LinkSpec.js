@@ -39,4 +39,32 @@ describe('Link', function() {
     }));
   });
 
+  it('extracts links from an element', function() {
+    var element = document.createElement('table');
+    element.innerHTML = 
+      '<tr>' +
+      '<td><span class="genmed"><strong>Code:</strong></span></td>' +
+      '</tr>' +
+      '<tr>' +
+      '<td class="code">NF&#58; https&#58;//safelinking.net/fj7KzFf' +
+      '<br />' +
+      'UL&#58; https&#58;//safelinking.net/dNMWhPG' +
+      '<br />' +
+      'RG&#58; https&#58;//safelinking.net/PF9bxdS</td></tr>';
+    links = Link.fromElement(element);
+    expect(links.length).toBe(3);
+    expect(links[0]).toEqual(jasmine.objectContaining({
+      hoster: 'NF',
+      link: 'https://safelinking.net/fj7KzFf'
+    }));
+    expect(links[1]).toEqual(jasmine.objectContaining({
+      hoster: 'UL',
+      link: 'https://safelinking.net/dNMWhPG'
+    }));
+    expect(links[2]).toEqual(jasmine.objectContaining({
+      hoster: 'RG',
+      link: 'https://safelinking.net/PF9bxdS'
+    }));
+  });
+
 });

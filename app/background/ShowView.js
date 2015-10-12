@@ -26,7 +26,11 @@ ShowView.prototype.loadShow = function(show) {
     show.episodes.forEach(function(episode) {
       episode.files = self.filterFiles(episode.files);
       episode.files.forEach(function(file) {
-        file.links = self.filterLinks(file.links);
+        if (file.links) {
+          file.links = self.filterLinks(file.links);
+        } else {
+          console.log('No files found for show', show.title, episode);
+        }
       });
     });
     return show;

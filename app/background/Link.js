@@ -4,14 +4,17 @@ function Link(hoster, link) {
 }
 
 Link.fromElement = function(element) {
+  var links = null;
   if (element.className == 'post-block code-block') {
     element = element.querySelector('.inner-content');
     var links = element.innerHTML.split('<br>');
     links = links.map(Link.fromText).filter(function(x) {return x});
-    return links;
-  } else {
-    return null;
+  } else if (element.tagName == 'TABLE') {
+    element = element.querySelector('.code');
+    var links = element.innerHTML.split('<br>');
+    links = links.map(Link.fromText).filter(function(x) {return x});
   }
+  return links;
 }
 
 Link.fromText = function(text) {
