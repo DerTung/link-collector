@@ -30,6 +30,10 @@ TopicScraper.prototype._analyzeMessage = function(message) {
   for (var i = 0; i < elements.length; i++) {
     var element = elements[i];
 
+    if (element.innerText == 'Previous Seasons:') {
+      break;
+    }
+
     var episode = Episode.fromElement(element);
     if (episode) {
       this._addEpisode(episode);

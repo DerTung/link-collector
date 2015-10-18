@@ -87,6 +87,15 @@ describe('TopicScraper', function() {
       });
     });
 
+    it('does not add links from previous seasons', function() {
+      fixture.load('walkingDead.htm');
+      html = fixture.el.innerHTML;
+      data = topicScraper.analyze(html);
+
+      links = data[0].files[2].links;
+      expect(links[0].link).not.toBe('https://safelinking.net/p/9ecfcf85a6');
+    });
+
   });
 
 });
