@@ -9,3 +9,11 @@ ul {
 #links {
   font-family: monospace;
 }
+
+.show {
+  -webkit-user-select: none;
+}
+
+.episode li {
+  -webkit-user-select: initial;
+}

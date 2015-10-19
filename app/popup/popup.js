@@ -8,6 +8,7 @@ chrome.runtime.sendMessage({action: 'getData'}, function(response) {
 
 function markDownloaded() {
   chrome.runtime.sendMessage({action: 'addDownloaded', shows: shows});
+  document.querySelector('#links').innerHTML = "";
 }
 
 document.addEventListener('DOMContentLoaded', function() {
