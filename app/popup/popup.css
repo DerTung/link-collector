@@ -17,3 +17,7 @@ ul {
 .episode li {
   -webkit-user-select: initial;
 }
+
+.error {
+  color: red;
+}

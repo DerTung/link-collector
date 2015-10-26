@@ -28,11 +28,14 @@ ShowView.prototype.loadShow = function(show) {
       episode.files.forEach(function(file) {
         if (file.links) {
           file.links = self.filterLinks(file.links);
-        } else {
-          console.log('No files found for show', show.title, episode);
         }
       });
     });
+    return show;
+  }).catch(function(error) {
+    console.log(error);
+    show.error = error;
+    show.episodes = [];
     return show;
   });
 };

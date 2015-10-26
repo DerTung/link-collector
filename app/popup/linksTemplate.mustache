@@ -1,6 +1,10 @@
 
 {{#shows}}
   <div class="show">
+    {{#error}}
+      <b>{{ title }}</b>
+      <ul><li class="error">{{ error }}</li></ul>
+    {{/error}}
     <div class="episodes">
       {{#episodes.length}}
       <b>{{ title }}</b>
@@ -19,6 +23,6 @@
         </li>
       {{/episodes}}
       </ul>
-    <div>
+    </div>
   </div>
 {{/shows}}

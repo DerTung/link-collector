@@ -5,27 +5,20 @@ describe('TopicLoader', function() {
   beforeEach(function() {
     fixture.load('goodWife.htm');
     jasmine.Ajax.install();
+
+    this.topicLoader = new TopicLoader(); 
+    this.promise = this.topicLoader.load(12255785);
   });
 
   afterEach(function() {
     jasmine.Ajax.uninstall();
   })
 
-  it('is awesome', function() {
-    expect(true).toBe(true);
-  });
-
   it('loads a page', function(done) {
-    var topicLoader = new TopicLoader(); 
-    var promise = topicLoader.load(12255785);
-    var fulfilledHandler = jasmine.createSpy('fulfilledHandler');
-    promise.then(function(data) {
+    this.promise.then(function(data) {
       expect(data).toEqual(fixture.el.innerHTML);
       done();
-    }, function() {
-      console.log(arguments);
-      done.fail();
-    });
+    }, done.fail);
 
     expect(jasmine.Ajax.requests.mostRecent().url).toBe('https://www.warez-bb.org/viewtopic.php?t=12255785');
     jasmine.Ajax.requests.mostRecent().respondWith({
@@ -35,4 +28,36 @@ describe('TopicLoader', function() {
     });
 
   });
+
+  it('rejects when the topic is not found', function(done) {
+    this.promise.then(function(data) {
+      done.fail('should have been rejected');
+    }, function(data) {
+      expect(data).toBe("Topic not found");
+      done()
+    });
+
+    jasmine.Ajax.requests.mostRecent().respondWith({
+      "status": 200,
+      "contentType": "text/html",
+      "responseText": "<html>...The topic or post you requested does not exist...</html>"
+    });
+  });
+
+  it('gracefully handles other errors', function(done) {
+    this.promise.then(function(data) {
+      done.fail('should have been rejected');
+    }, function(data) {
+      expect(data).toBe("File not found");
+      done()
+    });
+
+    jasmine.Ajax.requests.mostRecent().respondWith({
+      "status": 404,
+      "contentType": "text/html",
+      "responseText": "File not found"
+    });
+  });
+
+
 });
