@@ -14,10 +14,14 @@ ul {
   -webkit-user-select: none;
 }
 
-.episode li {
+.episode .link {
   -webkit-user-select: initial;
 }
 
 .error {
   color: red;
+}
+
+#settings {
+  margin-top: 20px;
 }

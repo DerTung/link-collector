@@ -8,13 +8,18 @@ EpisodeFilter.prototype.filter = function(show, episodes) {
   }, this);
 };
 
-EpisodeFilter.prototype.addDownloaded = function(shows) {
+EpisodeFilter.prototype.addShows = function(shows) {
   shows.forEach(function(show) {
     show.episodes.forEach(function(episode) {
-      localStorage.setItem(this.getEpisodeId(show, episode), true);
+      this.addEpisode(show, episode);
     }, this);
   }, this);
-} 
+};
+
+EpisodeFilter.prototype.addEpisode = function(show, episode) {
+  var id = this.getEpisodeId(show, episode);
+  localStorage.setItem(id, true);
+};
 
 EpisodeFilter.prototype.getEpisodeId = function(show, episode) {
   return show.topicId + '_' + episode.season + '_' + episode.episode;

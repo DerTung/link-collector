@@ -1,7 +1,47 @@
 <link href="popup.css" rel="stylesheet" type="text/css">
 <script src="popup.js"></script>
 
+<h3>Links:</h3>
 <div id="links">
 loading ...
 </div>
-<button id="markDownloaded" >Mark downloaded</button>
+<button id="markDownloaded" style="display: none">Mark as downloaded</button>
+
+<div id="settings">
+  <h3>Filters:</h3>
+  <label>
+    Format
+    <select id="format">
+      <option value=""></option>
+      <option value="AVI">AVI</option>
+      <option value="MP4">MP4</option>
+      <option value="MKV">MKV</option>
+    </select>
+  </label>
+  <label>
+    Codec
+    <select id="codec">
+      <option value=""></option>
+      <option value="XviD">XviD</option>
+      <option value="x264">x264</option>
+    </select>
+  </label>
+  <label>
+    Hoster
+    <select id="hoster">
+      <option value=""></option>
+      <option value="NF">NF</option>
+      <option value="HF">HF</option>
+      <option value="CNU">CNU</option>
+      <option value="ULD">ULD</option>
+      <option value="FF">FF</option>
+      <option value="UL">UL</option>
+      <option value="RG">RG</option>
+    </select>
+  </label>
+  <label>
+    Only Last
+    <input type="checkbox" id="onlyLast">
+  </label>
+</div>
+

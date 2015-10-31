@@ -15,9 +15,14 @@
           s{{ season }}e{{ episode }}
           <ul>
           {{#files}}
-            {{#links}}
-              <li>{{ link }}</li>
-            {{/links}}
+            <li>
+              <span class="file">{{ format }} | {{ codec }}</span>
+              <ul>
+                {{#links}}
+                  <li>{{ hoster }}: <span class="link">{{ link }}</span></li>
+                {{/links}}
+              </ul>
+            </li>
           {{/files}}
           </ul>
         </li>
@@ -26,3 +31,6 @@
     </div>
   </div>
 {{/shows}}
+{{^episodeCount}}
+  No new episodes found.
+{{/episodeCount}}
