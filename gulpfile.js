@@ -6,6 +6,7 @@ var source = require('vinyl-source-stream');
 
 var paths = {
   staticFiles: ['app/**/*png', 'app/**/*.json', 'app/**/*.html', 'app/**/*.css', 'app/content/content.js'],
+  infoFiles: ['LICENSE', 'CHANGELOG'],
   browserify: ['app/**/*.js', 'app/**/*.mustache']
 }
 
@@ -17,7 +18,11 @@ gulp.task('test', function (done) {
 });
 
 gulp.task('copy', function() {
-  gulp.src(paths.staticFiles, {base: 'app'}).pipe(gulp.dest('build'));
+  return gulp.src(paths.staticFiles, {base: 'app'}).pipe(gulp.dest('build'));
+});
+
+gulp.task('copyInfo', function() {
+  return gulp.src(paths.infoFiles).pipe(gulp.dest('build'));
 });
 
 gulp.task('browserify-background', function() {
@@ -45,7 +50,8 @@ gulp.task('browserify', ['browserify-background', 'browserify-popup']);
 
 gulp.task('watch', ['default'], function() {
   gulp.watch(paths.staticFiles, ['copy']);
+  gulp.watch(paths.infoFiles, ['copyInfo']);
   gulp.watch(paths.browserify, ['browserify']);
 });
 
-gulp.task('default', ['test', 'copy', 'browserify']);
+gulp.task('default', ['test', 'copy', 'copyInfo', 'browserify']);
