@@ -25,6 +25,14 @@ function updateSettings() {
   });
 }
 
+function setCredentials() {
+  chrome.runtime.sendMessage({
+    action: 'setCredentials',
+    username: $('#username').value,
+    password: $('#password').value
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   
   updateData();
@@ -56,12 +64,14 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   $('#setCredentials').addEventListener('click', function() {
-    chrome.runtime.sendMessage({
-      action: 'setCredentials',
-      username: $('#username').value,
-      password: $('#password').value
-    });
+    setCredentials();
     updateData();
+  });
+
+  $('#clearCredentials').addEventListener('click', function() {
+    $('#username').value = "";
+    $('#password').value = "";
+    setCredentials();
   });
 
 });

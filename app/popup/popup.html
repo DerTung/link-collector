@@ -1,13 +1,17 @@
+<title>LinkCollector</title>
 <link href="popup.css" rel="stylesheet" type="text/css">
 <script src="popup.js"></script>
 
-<h3>Links:</h3>
-<div id="links">
-loading ...
-</div>
-<button id="markDownloaded" style="display: none">Mark as downloaded</button>
+<section>
+  <h3>Links:</h3>
+  <div id="links">
+    loading ...
+  </div>
+  <button id="markDownloaded" style="display: none">Mark as downloaded</button>
+</section>
 
-<div id="settings">
+
+<section>
   <h3>Filters:</h3>
   <label>
     Format
@@ -43,11 +47,25 @@ loading ...
     Only Last
     <input type="checkbox" id="onlyLast">
   </label>
-</div>
-<div id="credentials">
+</section>
+
+<section>
   <h3>Login:</h3>
   <label>Username:</label> <input type="text" id="username">
   <label>Password:</label> <input type="password" id="password">
   <button id="setCredentials">Save</button>
-</div>
+  <button id="clearCredentials">Clear</button>
+  <p>Automatically login to warez-bb.org using these credentials if not already logged in.</p>
+</section>
+
+<section>
+  <h3>How it works:</h3>
+  <p>Look for shows from <a href="https://www.warez-bb.org/search.php?search_fields=firstpost&search_author=newage.&search_foru">NewAge</a> you are interested in and click the "Track show" button in the top right of the page.<br>
+  Whenever there is a new episode it will be shown on this page until you mark it as downloaded.</p>
+  <p>Please don't forget to post a quick "Thank you" on the show topics.</p>
+
+
+</section>
+
+
 
