@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
   
   updateData();
   updateSettings();
+  $('#username').value = localStorage.username || '';
+  $('#password').value = localStorage.password || '';
 
   
   $('#markDownloaded').addEventListener('click', markDownloaded);
@@ -50,6 +52,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
   $('#onlyLast').addEventListener('change', function() {
     chrome.runtime.sendMessage({action: 'setOnlyLast', value: this.checked});
+    updateData();
+  });
+
+  $('#setCredentials').addEventListener('click', function() {
+    chrome.runtime.sendMessage({
+      action: 'setCredentials',
+      username: $('#username').value,
+      password: $('#password').value
+    });
     updateData();
   });
 

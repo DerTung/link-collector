@@ -48,6 +48,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     linkFilter.setHoster(request.value);
   } else if (request.action == 'setOnlyLast') {
     fileFilter.setOnlyLast(request.value);
+  } else if (request.action == 'setCredentials') {
+    topicLoader.setCredentials(request.username, request.password);
   }
 });
 
