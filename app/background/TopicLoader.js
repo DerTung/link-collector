@@ -26,7 +26,6 @@ TopicLoader.prototype.load = function(topicId) {
         var password = localStorage.password;
         if (username && password) {
           self.login(username, password).then(function() {
-            console.log('xyz')
             resolve(self.load(topicId));
           }, reject);
         } else {

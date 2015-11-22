@@ -10,7 +10,6 @@ function markDownloaded() {
 function updateData() {
   chrome.runtime.sendMessage({action: 'getData'}, function(response) {
     shows = response.shows;
-    console.log(response);
     $('#links').innerHTML = linksTemplate(response);
     $('#markDownloaded').setAttribute('style', response.episodeCount ? '' : 'display: none');
   });
