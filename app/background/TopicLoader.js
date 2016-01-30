@@ -21,6 +21,8 @@ TopicLoader.prototype.load = function(topicId) {
         reject(xhr.responseText);
       } else if (xhr.responseText.indexOf('The topic or post you requested does not exist') != -1) {
         reject('Topic not found');
+      } else if (xhr.responseText.indexOf('The page you are looking for is temporarily unavailable.') != -1) {
+        reject('Topic temporarily unavailable');
       } else if (xhr.responseText.indexOf('Attention Guests: Please register to view all sections') != -1) {
         var username = localStorage.username;
         var password = localStorage.password;

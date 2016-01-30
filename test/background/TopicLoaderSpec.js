@@ -44,6 +44,21 @@ describe('TopicLoader', function() {
     });
   });
 
+  it('rejects when the topic is temporarily unavailable', function(done) {
+    this.promise.then(function(data) {
+      done.fail('should have been rejected');
+    }, function(data) {
+      expect(data).toBe("Topic temporarily unavailable");
+      done();
+    });
+
+    jasmine.Ajax.requests.mostRecent().respondWith({
+      "status": 200,
+      "contentType": "text/html",
+      "responseText": "The page you are looking for is temporarily unavailable. Please try again later."
+    });
+  })
+
   it('gracefully handles other errors', function(done) {
     this.promise.then(function(data) {
       done.fail('should have been rejected');
