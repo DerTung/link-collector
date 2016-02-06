@@ -1,5 +1,3 @@
-var Promise = require('bluebird');
-
 function ShowView(showList, topicScraper, topicLoader, episodeFilter, fileFilter, linkFilter) {
   this.showList = showList;
   this.topicScraper = topicScraper;

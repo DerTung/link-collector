@@ -1,4 +1,3 @@
-var Promise = require('bluebird');
 var ShowView = require('background/ShowView');
 var Episode = require('background/Episode');
 

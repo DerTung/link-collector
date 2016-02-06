@@ -1,5 +1,3 @@
-var Promise = require('bluebird');
-
 var TopicLoader = require('./TopicLoader');
 var TopicScraper = require('./TopicScraper');
 var ShowList = require('./ShowList');
