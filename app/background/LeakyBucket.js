@@ -1,6 +1,7 @@
-function LeakyBucket(size, interval) {
+function LeakyBucket(size, interval, rate) {
   this.size = size;
   this.interval = interval;
+  this.rate = rate;
   this.level = 0;
   
   this._intervalHandler = null;
@@ -23,7 +24,7 @@ LeakyBucket.prototype.isFull = function() {
 
 LeakyBucket.prototype._drain = function() {
   var wasFull = this.isFull();
-  this.level = Math.max(0, this.level - 1);
+  this.level = Math.max(0, this.level - this.rate);
   if (this.level === 0) {
     clearInterval(this._intervalHandler);
     this._intervalHandler = null;

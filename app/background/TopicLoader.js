@@ -4,19 +4,15 @@ function TopicLoader() {
   this.topicCache = {};
   this.queue = [];
   this.loading = 0;
-  this._leakyBucket = new LeakyBucket(this.LEAKY_BUCKET_SIZE, this.LEAKY_BUCKET_INTERVAL);
-  this._leakyBucket.on('draining', function() {
-    console.log('draining');
-    this._next();
-  }.bind(this));
-  
-  // this._next.bind(this) 
+  this._leakyBucket = new LeakyBucket(this.LEAKY_BUCKET_SIZE, this.LEAKY_BUCKET_INTERVAL, this.LEAKY_BUCKET_RATE);
+  this._leakyBucket.on('draining', this._next.bind(this));
 }
 
 TopicLoader.prototype.CACHE_DURATION = 300000; // 5 minutes
-TopicLoader.prototype.MAX_LOADING = 3;
+TopicLoader.prototype.MAX_LOADING = 15;
 TopicLoader.prototype.LEAKY_BUCKET_SIZE = 15;
-TopicLoader.prototype.LEAKY_BUCKET_INTERVAL = 10000 // 1 minute
+TopicLoader.prototype.LEAKY_BUCKET_INTERVAL = 60000;
+TopicLoader.prototype.LEAKY_BUCKET_RATE = 15;
 
 TopicLoader.prototype.load = function(topicId) {
   if (this.topicCache[topicId]) {
@@ -73,8 +69,7 @@ TopicLoader.prototype.load = function(topicId) {
 };
 
 TopicLoader.prototype._next = function() {
-  //console.log('next', this.queue.length, this._leakyBucket.isFull(), this._leakyBucket.level);
-  if (this.queue.length > 0 && !this._leakyBucket.isFull()) {
+  while (this.queue.length > 0 && !this._leakyBucket.isFull()) {
     this.queue.shift()(); 
   }
 };

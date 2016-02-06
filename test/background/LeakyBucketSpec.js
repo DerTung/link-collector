@@ -4,10 +4,11 @@ describe('LeakyBucket', function() {
   var bucket = null;
   var size = 3;
   var interval = 1000; //ms
+  var rate = 1;
   
   beforeEach(function() {
     jasmine.clock().install();
-    bucket = new LeakyBucket(size, interval);
+    bucket = new LeakyBucket(size, interval, rate);
   })
   
   afterEach(function() {

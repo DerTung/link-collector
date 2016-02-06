@@ -187,7 +187,7 @@ describe('TopicLoader', function() {
   
   it('loads multiple topcis', function(done) {
     var promises = [];
-    for (var i=1; i <= this.topicLoader.MAX_LOADING + 5; i++)  {
+    for (var i=1; i <= 5; i++)  {
       promises.push(this.topicLoader.load(i));
     }
   
@@ -212,19 +212,23 @@ describe('TopicLoader', function() {
       "responseText": "Blub"
     });
     this.topicLoader = new TopicLoader();
+    var bucketSize = this.topicLoader.LEAKY_BUCKET_SIZE;
+    var bucketInterval = this.topicLoader.LEAKY_BUCKET_INTERVAL;
+    var bucketRate = this.topicLoader.LEAKY_BUCKET_RATE; 
+    
     var promises = [];
-    for (var i=1; i <= this.topicLoader.LEAKY_BUCKET_SIZE + 2; i++)  {
+    for (var i=1; i <= bucketSize + bucketRate * 2; i++)  {
       promises.push(this.topicLoader.load(i));
     }
   
     Promise.all(promises).then(done);
-    expect(jasmine.Ajax.requests.count()).toBe(this.topicLoader.LEAKY_BUCKET_SIZE);
+    expect(jasmine.Ajax.requests.count()).toBe(bucketSize);
     
-    jasmine.clock().tick(this.topicLoader.LEAKY_BUCKET_INTERVAL);
-    expect(jasmine.Ajax.requests.count()).toBe(this.topicLoader.LEAKY_BUCKET_SIZE + 1);
+    jasmine.clock().tick(bucketInterval);
+    expect(jasmine.Ajax.requests.count()).toBe(bucketSize + bucketRate);
     
-    jasmine.clock().tick(this.topicLoader.LEAKY_BUCKET_INTERVAL);
-    expect(jasmine.Ajax.requests.count()).toBe(this.topicLoader.LEAKY_BUCKET_SIZE + 2);
+    jasmine.clock().tick(bucketInterval);
+    expect(jasmine.Ajax.requests.count()).toBe(bucketSize + bucketRate * 2);
 
     jasmine.clock().uninstall();
   });
