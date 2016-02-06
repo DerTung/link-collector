@@ -5,7 +5,7 @@ describe('TopicLoader', function() {
   beforeEach(function() {
     fixture.load('goodWife.htm');
     jasmine.Ajax.install();
-
+    
     this.topicLoader = new TopicLoader(); 
     this.promise = this.topicLoader.load(12255785);
   });
@@ -182,6 +182,49 @@ describe('TopicLoader', function() {
     this.topicLoader.load(12255785);
 
     expect(jasmine.Ajax.requests.count()).toBe(2);
+    jasmine.clock().uninstall()
+  });
+  
+  it('loads multiple topcis', function(done) {
+    var promises = [];
+    for (var i=1; i <= this.topicLoader.MAX_LOADING + 5; i++)  {
+      promises.push(this.topicLoader.load(i));
+    }
+  
+    Promise.all(promises).then(done);
+    expect(jasmine.Ajax.requests.count()).toBeLessThan(this.topicLoader.MAX_LOADING + 1);
+    
+    for (var i=0; i < jasmine.Ajax.requests.count(); i++) {
+      jasmine.Ajax.requests.at(i).respondWith({
+        "status": 200,
+        "contentType": "text/html",
+        "responseText": "Blub"
+      });
+    }
+  });
+  
+  it('limits the rate at which topics are loaded', function(done) {
+    jasmine.clock().install();
+    jasmine.Ajax.requests.reset();
+    jasmine.Ajax.stubRequest(/https:\/\/www\.warez-bb\.org\/viewtopic\.php\?t=\d+/).andReturn({
+      "status": 200,
+      "contentType": "text/html",
+      "responseText": "Blub"
+    });
+    this.topicLoader = new TopicLoader();
+    var promises = [];
+    for (var i=1; i <= this.topicLoader.LEAKY_BUCKET_SIZE + 2; i++)  {
+      promises.push(this.topicLoader.load(i));
+    }
+  
+    Promise.all(promises).then(done);
+    expect(jasmine.Ajax.requests.count()).toBe(this.topicLoader.LEAKY_BUCKET_SIZE);
+    
+    jasmine.clock().tick(this.topicLoader.LEAKY_BUCKET_INTERVAL);
+    expect(jasmine.Ajax.requests.count()).toBe(this.topicLoader.LEAKY_BUCKET_SIZE + 1);
+    
+    jasmine.clock().tick(this.topicLoader.LEAKY_BUCKET_INTERVAL);
+    expect(jasmine.Ajax.requests.count()).toBe(this.topicLoader.LEAKY_BUCKET_SIZE + 2);
 
     jasmine.clock().uninstall();
   });
@@ -206,5 +249,4 @@ describe('TopicLoader', function() {
       })).toBe('abc=123&def=456');
     });
   });
-
 });

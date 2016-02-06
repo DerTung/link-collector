@@ -1,10 +1,22 @@
-var Promise = require('bluebird');
+var LeakyBucket = require('./LeakyBucket');
 
 function TopicLoader() {
   this.topicCache = {};
+  this.queue = [];
+  this.loading = 0;
+  this._leakyBucket = new LeakyBucket(this.LEAKY_BUCKET_SIZE, this.LEAKY_BUCKET_INTERVAL);
+  this._leakyBucket.on('draining', function() {
+    console.log('draining');
+    this._next();
+  }.bind(this));
+  
+  // this._next.bind(this) 
 }
 
 TopicLoader.prototype.CACHE_DURATION = 300000; // 5 minutes
+TopicLoader.prototype.MAX_LOADING = 3;
+TopicLoader.prototype.LEAKY_BUCKET_SIZE = 15;
+TopicLoader.prototype.LEAKY_BUCKET_INTERVAL = 10000 // 1 minute
 
 TopicLoader.prototype.load = function(topicId) {
   if (this.topicCache[topicId]) {
@@ -14,33 +26,57 @@ TopicLoader.prototype.load = function(topicId) {
   var url = this._getURL(topicId);
   var self = this;
   return new Promise(function (resolve, reject) {
-    var xhr = new XMLHttpRequest;
-    xhr.addEventListener("error", reject);
-    xhr.addEventListener("load", function() {
-      if (xhr.status != 200) {
-        reject(xhr.responseText);
-      } else if (xhr.responseText.indexOf('The topic or post you requested does not exist') != -1) {
-        reject('Topic not found');
-      } else if (xhr.responseText.indexOf('The page you are looking for is temporarily unavailable.') != -1) {
-        reject('Topic temporarily unavailable');
-      } else if (xhr.responseText.indexOf('Attention Guests: Please register to view all sections') != -1) {
-        var username = localStorage.username;
-        var password = localStorage.password;
-        if (username && password) {
-          self.login(username, password).then(function() {
-            resolve(self.load(topicId));
-          }, reject);
+    
+    function load() {
+      self.loading++;
+      self._leakyBucket.add() 
+      
+      var xhr = new XMLHttpRequest;
+      xhr.addEventListener("error", function(error) {
+        reject(error);
+        self._next();
+      });
+      xhr.addEventListener("load", function() {
+        if (xhr.status != 200) {
+          reject(xhr.responseText);
+        } else if (xhr.responseText.indexOf('The topic or post you requested does not exist') != -1) {
+          reject('Topic not found');
+        } else if (xhr.responseText.indexOf('The page you are looking for is temporarily unavailable.') != -1) {
+          reject('Topic temporarily unavailable');
+        } else if (xhr.responseText.indexOf('Attention Guests: Please register to view all sections') != -1) {
+          var username = localStorage.username;
+          var password = localStorage.password;
+          if (username && password) {
+            self.login(username, password).then(function() {
+              resolve(self.load(topicId));
+            }, reject);
+          } else {
+            reject('Login to load topic');
+          }
         } else {
-          reject('Login to load topic');
+          self.cacheTopic(topicId, xhr.responseText);
+          resolve(xhr.responseText);
         }
-      } else {
-        self.cacheTopic(topicId, xhr.responseText);
-        resolve(xhr.responseText);
-      }
-    });
-    xhr.open("GET", url);
-    xhr.send(null);
+        self.loading -= 1;
+        self._next();
+      });
+      xhr.open("GET", url);
+      xhr.send(null);
+    }
+    
+    if (self.loading >= self.MAX_LOADING || self._leakyBucket.isFull()) {
+      self.queue.push(load);
+    } else {
+      load()
+    }
   });
+};
+
+TopicLoader.prototype._next = function() {
+  //console.log('next', this.queue.length, this._leakyBucket.isFull(), this._leakyBucket.level);
+  if (this.queue.length > 0 && !this._leakyBucket.isFull()) {
+    this.queue.shift()(); 
+  }
 };
 
 TopicLoader.prototype.login = function(username, password) {
