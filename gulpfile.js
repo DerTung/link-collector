@@ -48,10 +48,11 @@ gulp.task('browserify-popup', function() {
 
 gulp.task('browserify', ['browserify-background', 'browserify-popup']);
 
-gulp.task('watch', ['default'], function() {
+gulp.task('watch', ['build'], function() {
   gulp.watch(paths.staticFiles, ['copy']);
   gulp.watch(paths.infoFiles, ['copyInfo']);
   gulp.watch(paths.browserify, ['browserify']);
 });
 
-gulp.task('default', ['test', 'copy', 'copyInfo', 'browserify']);
+gulp.task('default', ['test', 'build']);
+gulp.task('build', ['copy', 'copyInfo', 'browserify']);
