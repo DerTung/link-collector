@@ -36,6 +36,28 @@ describe('File', function() {
         codec: 'x264'
       }));
     });
+    
+    it('recognizes MKV | HEVC | x265', function () {
+      var element = document.createElement('span');
+      element.innerHTML = '<span style="color: green;"><span style="font-style: italic;">MKV | HEVC | x265</span></span>';
+      
+      var file = File.fromElement(element);
+      expect(file).toEqual(jasmine.objectContaining({
+        format: 'MKV',
+        codec: 'HEVC'
+      }));
+    })
+    
+    it('regnizes if HEVC has a typo', function() {
+      var element = document.createElement('span');
+      element.innerHTML = '<span style="color: green;"><span style="font-style: italic;">MKV | HECV | x265</span></span>';
+      
+      var file = File.fromElement(element);
+      expect(file).toEqual(jasmine.objectContaining({
+        format: 'MKV',
+        codec: 'HEVC'
+      }));
+    })
 
   });
 

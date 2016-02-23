@@ -41,7 +41,7 @@ describe('ShowView', function() {
     this.showView = new ShowView(this.showList, this.topicScraper, this.topicLoader, this.episodeFilter, this.fileFilter, this.linkFilter);
   })
 
-  describe('getData', function(done) {
+  describe('getData', function() {
 
     it('returns the correct data', function(done) {
       this.showView.getData().then(function(data) {

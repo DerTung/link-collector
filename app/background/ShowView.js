@@ -53,7 +53,7 @@ ShowView.prototype.loadShow = function(show) {
     });
     return show;
   }).catch(function(error) {
-    show.error = error;
+    show.error = error.stack || error
     show.episodes = [];
     return show;
   });

@@ -1,3 +1,4 @@
+/* global fixture */
 var TopicScraper = require('background/TopicScraper');
 var Episode = require('background/Episode');
 
@@ -92,7 +93,7 @@ describe('TopicScraper', function() {
       html = fixture.el.innerHTML;
       data = topicScraper.analyze(html);
 
-      links = data[0].files[2].links;
+      var links = data[0].files[2].links;
       expect(links[0].link).not.toBe('https://safelinking.net/p/9ecfcf85a6');
     });
 
