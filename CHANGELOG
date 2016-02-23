@@ -1,2 +1,6 @@
-1.0.0:
+0.1.0
+- Throttle loading to 13 topics per minute to avoid errors
+- Added additional error handling
+
+0.0.1
 - First release
