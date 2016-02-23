@@ -9,10 +9,10 @@ function TopicLoader() {
 }
 
 TopicLoader.prototype.CACHE_DURATION = 300000; // 5 minutes
-TopicLoader.prototype.MAX_LOADING = 15;
-TopicLoader.prototype.LEAKY_BUCKET_SIZE = 15;
+TopicLoader.prototype.MAX_LOADING = 13;
+TopicLoader.prototype.LEAKY_BUCKET_SIZE = 13;
 TopicLoader.prototype.LEAKY_BUCKET_INTERVAL = 60000;
-TopicLoader.prototype.LEAKY_BUCKET_RATE = 15;
+TopicLoader.prototype.LEAKY_BUCKET_RATE = 13;
 
 TopicLoader.prototype.load = function(topicId) {
   if (this.topicCache[topicId]) {
