@@ -5,7 +5,19 @@ var mustache = require('browserify-mustache');
 var source = require('vinyl-source-stream');
 
 var paths = {
-  staticFiles: ['app/**/*png', 'app/**/*.json', 'app/**/*.html', 'app/**/*.css', 'app/content/content.js'],
+  staticFiles: [
+    'app/**/*png', 
+    'app/**/*.json',
+    'app/**/*.html',
+    'app/**/*.css',
+    'app/content/content.js',
+    'app/main/**/*.js'
+  ],
+  staticBowerComponents: [
+    'bower_components/angular/angular.min.js',
+    'bower_components/angular/angular.min.js.map',
+    'bower_components/bootstrap/dist/**/*.*'
+  ],
   infoFiles: ['LICENSE', 'CHANGELOG'],
   browserify: ['app/**/*.js', 'app/**/*.mustache']
 }
@@ -23,6 +35,10 @@ gulp.task('copy', function() {
 
 gulp.task('copyInfo', function() {
   return gulp.src(paths.infoFiles).pipe(gulp.dest('build'));
+});
+
+gulp.task('copyBowerComponents', function () {
+  return gulp.src(paths.staticBowerComponents, {base: './'}).pipe(gulp.dest('build'));
 });
 
 gulp.task('browserify-background', function() {
@@ -55,4 +71,4 @@ gulp.task('watch', ['build'], function() {
 });
 
 gulp.task('default', ['test', 'build']);
-gulp.task('build', ['copy', 'copyInfo', 'browserify']);
+gulp.task('build', ['copy', 'copyInfo', 'copyBowerComponents', 'browserify']);

@@ -1,0 +1,25 @@
+<section class="container">
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" aria-valuenow="{{showCtrl.loaded}}" aria-valuemin="0" aria-valuemax="{{showCtrl.total}}" style="width: {{showCtrl.loaded / showCtrl.total * 100}}%;">
+      <span>{{showCtrl.loaded}} / {{showCtrl.total}} shows loaded</span>
+    </div>
+  </div>
+  <h3>Shows:</h3>
+  <div ng-repeat="show in showCtrl.shows" class="show" ng-show="show.episodes.length || show.error">
+    <b> {{show.title}} </b>
+    <ul ng-show="show.error"><li class="error">{{ show.error }}</li></ul>
+    <ul>
+      <li ng-repeat="episode in show.episodes" class="episode">
+        s{{ episode.season }}e{{ episode.episode }}
+        <ul>
+          <li ng-repeat="file in episode.files">
+            <span class="file">{{ file.format }} | {{ file.codec }}</span>
+            <ul>
+              <li ng-repeat="link in file.links">{{ link.hoster }}: <span class="link">{{ link.link }}</span></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
