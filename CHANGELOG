@@ -1,3 +1,6 @@
+0.2.0
+- Updated UI
+
 0.1.0
 - Throttle loading to 13 topics per minute to avoid errors
 - Added additional error handling
