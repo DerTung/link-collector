@@ -11,23 +11,39 @@
      var service = {};
      Object.keys(options).forEach(function(key) {
        var lsKey = options[key];
-       console.log(lsKey, localStorage.getItem(lsKey))
        service[key] = localStorage.getItem(lsKey);
        $rootScope.$watch(function() {
         return service[key];
        }, function() {
-         console.log(key, service[key], lsKey);
          localStorage.setItem(lsKey, service[key]);
        });
      });
      return service;
   });
   
+  app.factory('messageService', function($q) {
+    function sendMessage(msg) {
+      return $q(function(resolve, reject) {
+        chrome.runtime.sendMessage(msg, function(response) {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(response);
+          }
+        });
+      });
+    }
+    
+    return {
+      sendMessage: sendMessage
+    }
+  });
+  
   app.directive('showList', function() {
     return {
       restrict: 'E',
       templateUrl: 'show-list.html',
-      controller:  function($scope, filterService) {
+      controller:  function($scope, messageService, filterService) {
         var showCtrl = this;
         showCtrl.filterService = filterService;
         try {
@@ -36,22 +52,29 @@
           showCtrl.shows = [];
         }
         
+        showCtrl.markDownloaded = function() {
+          messageService.sendMessage({
+            action: 'addDownloaded',
+            shows: showCtrl.shows
+          }).then(loadShows);
+        };
+        
         var loadId = 0;
         function loadShows() {
           // guard against old callbacks when changing filters
           var _loadId = loadId = loadId + 1;
+          showCtrl.episodeCount = 0;
           showCtrl.loaded = 0;
           showCtrl.total = showCtrl.shows.length;
           showCtrl.shows.forEach(function(show) {
-            chrome.runtime.sendMessage({action: 'loadShow', show: show}, function(data) {
+            messageService.sendMessage({action: 'loadShow', show: show}).then(function (data) {
               if (loadId == _loadId) {
-                $scope.$apply(function() {
-                  show.episodes = data.episodes;
-                  show.error = data.error;
-                  showCtrl.loaded++;
-                });
+                show.episodes = data.episodes;
+                show.error = data.error;
+                showCtrl.loaded++;
+                showCtrl.episodeCount += show.episodes.length;
               }
-            });
+            })
           });
         }
         $scope.$watch(function () {

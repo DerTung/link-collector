@@ -5,21 +5,29 @@
     </div>
   </div>
   <h3>Shows:</h3>
-  <div ng-repeat="show in showCtrl.shows" class="show" ng-show="show.episodes.length || show.error">
-    <b> {{show.title}} </b>
-    <ul ng-show="show.error"><li class="error">{{ show.error }}</li></ul>
-    <ul>
-      <li ng-repeat="episode in show.episodes" class="episode">
-        s{{ episode.season }}e{{ episode.episode }}
-        <ul>
-          <li ng-repeat="file in episode.files">
-            <span class="file">{{ file.format }} | {{ file.codec }}</span>
-            <ul>
-              <li ng-repeat="link in file.links">{{ link.hoster }}: <span class="link">{{ link.link }}</span></li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-    </ul>
+  <div ng-show="showCtrl.episodeCount == 0 && showCtrl.loaded == showCtrl.total">
+    No new episodes found.
   </div>
+  <ul class="list-group">
+    <li class="list-group-item show" ng-repeat="show in showCtrl.shows" ng-show="show.episodes.length || show.error">
+      <b> {{show.title}} </b>
+      <ul ng-show="show.error"><li class="text-danger">{{ show.error }}</li></ul>
+      <ul>
+        <li ng-repeat="episode in show.episodes" class="episode">
+          s{{ episode.season }}e{{ episode.episode }}
+          <ul>
+            <li ng-repeat="file in episode.files">
+              <span class="file">{{ file.format }} | {{ file.codec }}</span>
+              <ul>
+                <li ng-repeat="link in file.links">{{ link.hoster }}: <span class="link">{{ link.link }}</span></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  <br/>
+  <button class="btn btn-primary" ng-click="showCtrl.markDownloaded()" 
+          ng-show="showCtrl.episodeCount">Mark as downloaded</button>
 </section>

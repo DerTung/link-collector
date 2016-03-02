@@ -49,6 +49,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     sendResponse(showList.contains(request.show));
   } else if (request.action == 'addDownloaded') {
     episodeFilter.addShows(request.shows);
+    sendResponse();
   } else if (request.action == 'setFormat') {
     fileFilter.setFormat(request.value);
   } else if (request.action == 'setCodec') {

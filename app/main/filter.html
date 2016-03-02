@@ -1,41 +1,42 @@
 <section class="container">
   <h3>Filters:</h3>
-  <label>
-    Format
-    <select ng-model="filterCtrl.state.format">
-      <option value=""></option>
-      <option value="AVI">AVI</option>
-      <option value="MP4">MP4</option>
-      <option value="MKV">MKV</option>
-    </select>
-  </label>
-  <label>
-    Codec
-    <select ng-model="filterCtrl.state.codec">
-      <option value=""></option>
-      <option value="XviD">XviD</option>
-      <option value="x264">x264</option>
-      <option value="HEVC">HEVC</option>
-      <option value="x265">x265</option>
-    </select>
-  </label>
-  <label>
-    Hoster
-    <select ng-model="filterCtrl.state.hoster"">
-      <option value=""></option>
-      <option value="NF">NF</option>
-      <option value="HF">HF</option>
-      <option value="CNU">CNU</option>
-      <option value="ULD">ULD</option>
-      <option value="FF">FF</option>
-      <option value="UL">UL</option>
-      <option value="RG">RG</option>
-    </select>
-  </label>
-  <label>
-    Only Last
-    <input type="checkbox" ng-model="filterCtrl.state.onlyLast"
-                           ng-true-value="'true'"
-                           ng-false-value="''">
-  </label>
+  <form class="form-inline" role="form">
+    <div class="form-group">
+      <label for="format">Format:</label>
+      <select class="form-control" id="format" ng-model="filterCtrl.state.format">
+        <option value=""></option>
+        <option value="AVI">AVI</option>
+        <option value="MP4">MP4</option>
+        <option value="MKV">MKV</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="codec">Codec:</label>
+      <select class="form-control" id="codec" ng-model="filterCtrl.state.codec">
+        <option value=""></option>
+        <option value="XviD">XviD</option>
+        <option value="x264">x264</option>
+        <option value="HEVC">HEVC</option>
+        <option value="x265">x265</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="hoster">Hoster:</label>
+      <select class="form-control" id="hoster" ng-model="filterCtrl.state.hoster"">
+        <option value=""></option>
+        <option value="NF">NF</option>
+        <option value="HF">HF</option>
+        <option value="CNU">CNU</option>
+        <option value="ULD">ULD</option>
+        <option value="FF">FF</option>
+        <option value="UL">UL</option>
+        <option value="RG">RG</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="onlyLast">Only Last:</label> 
+      <input class="form-control" type="checkbox" id="onlyLast" ng-model="filterCtrl.state.onlyLast"
+          ng-true-value="'true'" ng-false-value="''">
+    </div>
+  </form>
 </section>
