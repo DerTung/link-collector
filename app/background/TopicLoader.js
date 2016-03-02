@@ -8,7 +8,7 @@ function TopicLoader() {
   this._leakyBucket.on('draining', this._next.bind(this));
 }
 
-TopicLoader.prototype.CACHE_DURATION = 300000; // 5 minutes
+TopicLoader.prototype.CACHE_DURATION = 1800 * 1000; // 30 minutes
 TopicLoader.prototype.MAX_LOADING = 13;
 TopicLoader.prototype.LEAKY_BUCKET_SIZE = 13;
 TopicLoader.prototype.LEAKY_BUCKET_INTERVAL = 60000;
