@@ -51,18 +51,7 @@ gulp.task('browserify-background', function() {
     .pipe(gulp.dest('./build/background'));
 });
 
-gulp.task('browserify-popup', function() {
-  return browserify('./app/popup/popup.js', {
-    insertGlobals : true,
-    debug : true,
-    paths: ['./app/', './bower_components/'],    
-  }).transform(mustache)
-    .bundle()
-    .pipe(source('popup.js'))
-    .pipe(gulp.dest('./build/popup/'));
-})
-
-gulp.task('browserify', ['browserify-background', 'browserify-popup']);
+gulp.task('browserify', ['browserify-background']);
 
 gulp.task('watch', ['build'], function() {
   gulp.watch(paths.staticFiles, ['copy']);
