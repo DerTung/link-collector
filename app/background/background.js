@@ -5,6 +5,7 @@ var ShowView = require('./ShowView');
 var EpisodeFilter = require('./EpisodeFilter');
 var FileFilter = require('./FileFilter');
 var LinkFilter = require('./LinkFilter');
+var ShowController = require('./ShowController');
 
 var showList = new ShowList();
 var topicLoader = new TopicLoader();
@@ -12,16 +13,26 @@ var topicScraper = new TopicScraper();
 var episodeFilter = new EpisodeFilter();
 var fileFilter = new FileFilter();
 var linkFilter = new LinkFilter();
+
 var showView = new ShowView(showList, 
                             topicScraper, 
                             topicLoader, 
                             episodeFilter,
                             fileFilter,
                             linkFilter);
+                            
+var showController = new ShowController(topicScraper, 
+                                        topicLoader, 
+                                        episodeFilter,
+                                        fileFilter,
+                                        linkFilter);                            
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action == "getData") {
     showView.getData().then(sendResponse);
+    return true;
+  } else if (request.action == 'loadShow') {
+    showController.loadShow(request.show).then(sendResponse);
     return true;
   } else if (request.action == "getSettings") {
     sendResponse({
@@ -38,6 +49,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     sendResponse(showList.contains(request.show));
   } else if (request.action == 'addDownloaded') {
     episodeFilter.addShows(request.shows);
+    sendResponse();
   } else if (request.action == 'setFormat') {
     fileFilter.setFormat(request.value);
   } else if (request.action == 'setCodec') {
@@ -53,7 +65,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 chrome.browserAction.onClicked.addListener(function () {
   chrome.tabs.create({
-    url: chrome.extension.getURL('popup/popup.html')
+    url: chrome.extension.getURL('main/index.html')
   });
 });
 

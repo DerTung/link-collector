@@ -5,7 +5,19 @@ var mustache = require('browserify-mustache');
 var source = require('vinyl-source-stream');
 
 var paths = {
-  staticFiles: ['app/**/*png', 'app/**/*.json', 'app/**/*.html', 'app/**/*.css', 'app/content/content.js'],
+  staticFiles: [
+    'app/**/*png', 
+    'app/**/*.json',
+    'app/**/*.html',
+    'app/**/*.css',
+    'app/content/content.js',
+    'app/main/**/*.js'
+  ],
+  staticBowerComponents: [
+    'bower_components/angular/angular.min.js',
+    'bower_components/angular/angular.min.js.map',
+    'bower_components/bootstrap/dist/**/*.*'
+  ],
   infoFiles: ['LICENSE', 'CHANGELOG'],
   browserify: ['app/**/*.js', 'app/**/*.mustache']
 }
@@ -25,6 +37,10 @@ gulp.task('copyInfo', function() {
   return gulp.src(paths.infoFiles).pipe(gulp.dest('build'));
 });
 
+gulp.task('copyBowerComponents', function () {
+  return gulp.src(paths.staticBowerComponents, {base: './'}).pipe(gulp.dest('build'));
+});
+
 gulp.task('browserify-background', function() {
   return browserify('./app/background/background.js', {
     insertGlobals : true,
@@ -35,18 +51,7 @@ gulp.task('browserify-background', function() {
     .pipe(gulp.dest('./build/background'));
 });
 
-gulp.task('browserify-popup', function() {
-  return browserify('./app/popup/popup.js', {
-    insertGlobals : true,
-    debug : true,
-    paths: ['./app/', './bower_components/'],    
-  }).transform(mustache)
-    .bundle()
-    .pipe(source('popup.js'))
-    .pipe(gulp.dest('./build/popup/'));
-})
-
-gulp.task('browserify', ['browserify-background', 'browserify-popup']);
+gulp.task('browserify', ['browserify-background']);
 
 gulp.task('watch', ['build'], function() {
   gulp.watch(paths.staticFiles, ['copy']);
@@ -55,4 +60,4 @@ gulp.task('watch', ['build'], function() {
 });
 
 gulp.task('default', ['test', 'build']);
-gulp.task('build', ['copy', 'copyInfo', 'browserify']);
+gulp.task('build', ['copy', 'copyInfo', 'copyBowerComponents', 'browserify']);
