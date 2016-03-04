@@ -87,6 +87,63 @@ describe('TopicLoader', function() {
       "responseText": "Logged in"
     });
   });
+  
+  it('loggs the user in before sending more than one request', function(done) {
+    localStorage.username = 'john@example.com';
+    localStorage.password = 'qwerty';
+    var p1 = this.promise;
+    var p2 = this.topicLoader.load(123); 
+    var p3 = this.topicLoader.load(456);
+    expect(jasmine.Ajax.requests.mostRecent().url).toBe('https://www.warez-bb.org/viewtopic.php?t=12255785');
+    expect(jasmine.Ajax.requests.count()).toBe(1); // First load
+    jasmine.Ajax.requests.mostRecent().respondWith({
+      "status": 200,
+      "contentType": "text/html",
+      "responseText": "<h1>Attention Guests: Please register to view all sections</h1>"
+    });
+    expect(jasmine.Ajax.requests.mostRecent().url).toBe('https://www.warez-bb.org/login.php');
+    expect(jasmine.Ajax.requests.count()).toBe(2); // Login
+    jasmine.Ajax.requests.mostRecent().respondWith({
+      "status": 200,
+      "contentType": "text/html",
+      "responseText": "Logged in"
+    });
+    setTimeout(function() {
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        "status": 200,
+        "contentType": "text/html",
+        "responseText": "My nice show"
+      });
+    }, 0);
+    p1.then(function() {
+      expect(jasmine.Ajax.requests.count()).toBe(5);
+      done();
+    });
+  });
+  
+  it('rejects all other topics if no credentials are set', function(done) {
+    var promises = [
+      this.promise,
+      this.topicLoader.load(123),
+      this.topicLoader.load(456)
+    ];
+    promises = promises.map(function(promise) {
+      return promise.then(function() {
+        done.fail('should have been rejected');
+      }, function (msg) {
+        expect(msg).toBe('Login to load topic');
+      });
+    });
+    Promise.all(promises).then(function() {
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      done();
+    });
+    jasmine.Ajax.requests.mostRecent().respondWith({
+      "status": 200,
+      "contentType": "text/html",
+      "responseText": "<h1>Attention Guests: Please register to view all sections</h1>"
+    });
+  });
 
   it('recognizes wrong credentials', function(done) {
     this.topicLoader.login('john@example.com', 'qwerty').then(function(data) {

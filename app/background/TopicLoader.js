@@ -4,6 +4,7 @@ function TopicLoader() {
   this.topicCache = {};
   this.queue = [];
   this.loading = 0;
+  this.loggedIn = null;
   this._leakyBucket = new LeakyBucket(this.LEAKY_BUCKET_SIZE, this.LEAKY_BUCKET_INTERVAL, this.LEAKY_BUCKET_RATE);
   this._leakyBucket.on('draining', this._next.bind(this));
 }
@@ -24,12 +25,19 @@ TopicLoader.prototype.load = function(topicId) {
   return new Promise(function (resolve, reject) {
     
     function load() {
+      if (self.loggedIn === false) {
+        reject('Login to load topic');
+        self._next();
+        return;
+      }
+      
       self.loading++;
       self._leakyBucket.add() 
       
       var xhr = new XMLHttpRequest;
       xhr.addEventListener("error", function(error) {
-        reject(error);
+        self.loading--;
+        reject(error);        
         self._next();
       });
       xhr.addEventListener("load", function() {
@@ -47,20 +55,24 @@ TopicLoader.prototype.load = function(topicId) {
               resolve(self.load(topicId));
             }, reject);
           } else {
+            self.loggedIn = false;
             reject('Login to load topic');
           }
         } else {
+          self.loggedIn = true;
           self.cacheTopic(topicId, xhr.responseText);
           resolve(xhr.responseText);
         }
-        self.loading -= 1;
+        self.loading--;
         self._next();
       });
       xhr.open("GET", url);
       xhr.send(null);
     }
     
-    if (self.loading >= self.MAX_LOADING || self._leakyBucket.isFull()) {
+    if (self.loading >= self.MAX_LOADING || 
+        self._leakyBucket.isFull() ||
+        !self.loggedIn && self.loading > 0) {
       self.queue.push(load);
     } else {
       load()
@@ -69,23 +81,33 @@ TopicLoader.prototype.load = function(topicId) {
 };
 
 TopicLoader.prototype._next = function() {
-  while (this.queue.length > 0 && !this._leakyBucket.isFull()) {
+  while (this.queue.length > 0 && 
+         !this._leakyBucket.isFull() && 
+         (this.loggedIn || this.loading == 0)) {
     this.queue.shift()(); 
   }
 };
 
 TopicLoader.prototype.login = function(username, password) {
   var self = this;
+  self.loading++;
   return new Promise(function (resolve, reject) {
     var xhr = new XMLHttpRequest;
-    xhr.addEventListener("error", reject);
+    xhr.addEventListener("error", function(error) {
+      self.loading--;
+      reject(error);
+    });
     xhr.addEventListener("load", function() {
+      self.loading--;
       if (xhr.status != 200) {
+        self.loggedIn = false;
         reject(xhr.responseText);
       } else if (xhr.responseText.indexOf('It appears that you have entered an incorrect password') != -1) {
+        self.loggedIn = false;
         reject('Wrong username or password');
       } else {
-        resolve(xhr.responseText);
+        self.loggedIn = true;
+        resolve();
       }
     });
 
