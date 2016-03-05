@@ -1,8 +1,13 @@
+var minimist = require('minimist');
 var gulp = require('gulp');
+var replace = require('gulp-replace');
+var insert = require('gulp-insert');
 var KarmaServer = require('karma').Server;
 var browserify = require('browserify');
 var mustache = require('browserify-mustache');
 var source = require('vinyl-source-stream');
+
+var argv = minimist(process.argv.slice(2))
 
 var paths = {
   staticFiles: [
@@ -19,7 +24,8 @@ var paths = {
     'bower_components/bootstrap/dist/**/*.*'
   ],
   infoFiles: ['LICENSE', 'CHANGELOG'],
-  browserify: ['app/**/*.js', 'app/**/*.mustache']
+  browserify: ['app/**/*.js', 'app/**/*.mustache'],
+  versions: ['package.json', 'bower.json', 'app/manifest.json']
 }
 
 gulp.task('test', function (done) {
@@ -39,6 +45,19 @@ gulp.task('copyInfo', function() {
 
 gulp.task('copyBowerComponents', function () {
   return gulp.src(paths.staticBowerComponents, {base: './'}).pipe(gulp.dest('build'));
+});
+
+gulp.task('version', function() {
+  var version = argv.version;
+  if (!version) throw "No version specified, use --version=1.2.3";
+  if (!version.match(/^\d+\.\d+\.\d+$/)) throw "Incorrect version format: " + version;
+  gulp.src(paths.versions, {base : './'})
+    .pipe(replace(/"version": "\d+\.\d+\.\d+"/, '"version": "' + version + '"'))
+    .pipe(gulp.dest('./')),
+    
+  gulp.src(['CHANGELOG'])
+      .pipe(insert.prepend(version + '\n\n'))
+      .pipe(gulp.dest('.'));
 });
 
 gulp.task('browserify-background', function() {
