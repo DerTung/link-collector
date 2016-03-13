@@ -4,7 +4,7 @@ function TopicLoader() {
   this.topicCache = {};
   this.queue = [];
   this.loading = 0;
-  this.loggedIn = null;
+  this._loggedIn = null;
   this._leakyBucket = new LeakyBucket(this.LEAKY_BUCKET_SIZE, this.LEAKY_BUCKET_INTERVAL, this.LEAKY_BUCKET_RATE);
   this._leakyBucket.on('draining', this._next.bind(this));
 }
@@ -14,6 +14,7 @@ TopicLoader.prototype.MAX_LOADING = 13;
 TopicLoader.prototype.LEAKY_BUCKET_SIZE = 13;
 TopicLoader.prototype.LEAKY_BUCKET_INTERVAL = 60000;
 TopicLoader.prototype.LEAKY_BUCKET_RATE = 13;
+TopicLoader.prototype.LOGGED_IN_DURATION = 300000; // minutes
 
 TopicLoader.prototype.load = function(topicId) {
   if (this.topicCache[topicId]) {
@@ -25,7 +26,7 @@ TopicLoader.prototype.load = function(topicId) {
   return new Promise(function (resolve, reject) {
     
     function load() {
-      if (self.loggedIn === false) {
+      if (self.isLoggedIn() === false) {
         reject('Login to load topic');
         self._next();
         return;
@@ -55,11 +56,11 @@ TopicLoader.prototype.load = function(topicId) {
               resolve(self.load(topicId));
             }, reject);
           } else {
-            self.loggedIn = false;
+            self.setLoggedIn(false);
             reject('Login to load topic');
           }
         } else {
-          self.loggedIn = true;
+          self.setLoggedIn(true);
           self.cacheTopic(topicId, xhr.responseText);
           resolve(xhr.responseText);
         }
@@ -72,7 +73,7 @@ TopicLoader.prototype.load = function(topicId) {
     
     if (self.loading >= self.MAX_LOADING || 
         self._leakyBucket.isFull() ||
-        !self.loggedIn && self.loading > 0) {
+        !self.isLoggedIn() && self.loading > 0) {
       self.queue.push(load);
     } else {
       load()
@@ -83,7 +84,7 @@ TopicLoader.prototype.load = function(topicId) {
 TopicLoader.prototype._next = function() {
   while (this.queue.length > 0 && 
          !this._leakyBucket.isFull() && 
-         (this.loggedIn || this.loading == 0)) {
+         (this.isLoggedIn() || this.loading == 0)) {
     this.queue.shift()(); 
   }
 };
@@ -100,13 +101,13 @@ TopicLoader.prototype.login = function(username, password) {
     xhr.addEventListener("load", function() {
       self.loading--;
       if (xhr.status != 200) {
-        self.loggedIn = false;
+        self.setLoggedIn(false);
         reject(xhr.responseText);
       } else if (xhr.responseText.indexOf('It appears that you have entered an incorrect password') != -1) {
-        self.loggedIn = false;
+        self.setLoggedIn(false);
         reject('Wrong username or password');
       } else {
-        self.loggedIn = true;
+        self.setLoggedIn(true);
         resolve();
       }
     });
@@ -121,6 +122,14 @@ TopicLoader.prototype.login = function(username, password) {
     };  
     xhr.send(self._encodeData(data));
   });
+};
+
+TopicLoader.prototype.setLoggedIn = function(value) {
+  this._loggedIn = value ? Date.now() + this.LOGGED_IN_DURATION : value;
+};
+
+TopicLoader.prototype.isLoggedIn = function() {
+  return this._loggedIn && (Date.now() < this._loggedIn || null);
 };
 
 TopicLoader.prototype._getURL = function(topicId) {

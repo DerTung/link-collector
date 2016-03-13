@@ -310,4 +310,36 @@ describe('TopicLoader', function() {
       })).toBe('abc=123&def=456');
     });
   });
+  
+  describe('loggedIn', function() {
+    beforeEach(function() {
+      jasmine.clock().install();
+      jasmine.clock().mockDate();
+    });
+    
+    afterEach(function() {
+      jasmine.clock().uninstall();
+    });
+    
+    it('is initially unknown (null)', function() {
+      expect(this.topicLoader.isLoggedIn()).toBe(null);  
+    });
+    
+    it('keeps track of being logged out', function() {
+      this.topicLoader.setLoggedIn(false);
+      expect(this.topicLoader.isLoggedIn()).toBe(false);
+    });
+    
+    it('keeps track of being logged in', function() {
+      this.topicLoader.setLoggedIn(true);
+      expect(this.topicLoader.isLoggedIn()).toBe(true);
+    });
+    
+    it('resets to unknown after 5 minutes', function() {
+      this.topicLoader.setLoggedIn(true);
+      jasmine.clock().tick(5 * 60 * 1000);
+      expect(this.topicLoader.isLoggedIn()).toBe(null);
+    });
+  });
+  
 });
