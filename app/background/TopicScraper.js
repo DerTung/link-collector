@@ -15,7 +15,7 @@ TopicScraper.prototype.analyze = function(html) {
   var message = this._getFirstMessage(doc);
   this._analyzeMessage(message);
 
-  return this._episodes
+  return this._episodes;
 };
 
 TopicScraper.prototype._getFirstMessage = function(doc) {
@@ -23,7 +23,6 @@ TopicScraper.prototype._getFirstMessage = function(doc) {
 }
 
 TopicScraper.prototype._analyzeMessage = function(message) {
-  var episodes = [];
   var elements = message.children;
   var currentFile = null;
 
@@ -33,7 +32,7 @@ TopicScraper.prototype._analyzeMessage = function(message) {
     if (element.innerText == 'Previous Seasons:') {
       break;
     }
-
+    
     var episode = Episode.fromElement(element);
     if (episode) {
       this._addEpisode(episode);
@@ -41,6 +40,11 @@ TopicScraper.prototype._analyzeMessage = function(message) {
     }
     if (!this._getCurrentEpisode()) {
       continue;
+    }
+    
+    var airDate = this._getAirDateFromElement(element);
+    if (airDate) {
+      this._getCurrentEpisode().airDate = airDate;
     }
 
     var file = File.fromElement(element);
@@ -67,5 +71,16 @@ TopicScraper.prototype._getCurrentEpisode = function() {
   var length = this._episodes.length;
   return length ? this._episodes[length -1] : null;
 };
+
+TopicScraper.prototype._getAirDateFromElement = function(element) {
+  var m = /Airs (.*)/.exec(element.innerText);
+  if (m) {
+    var date = new Date(m[1]);
+    return !isNaN(date) ? date : null;
+  }
+  return null;
+}
+
+
 
 module.exports = TopicScraper;

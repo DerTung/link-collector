@@ -96,6 +96,12 @@ describe('TopicScraper', function() {
       var links = data[0].files[2].links;
       expect(links[0].link).not.toBe('https://safelinking.net/p/9ecfcf85a6');
     });
+    
+    it('extracts air dates', function() {
+      expect(data[0].airDate).toEqual(new Date('Friday Oct 09, 2015'));
+      expect(data[1].airDate).toEqual(new Date('Friday Oct 02, 2015'));
+      expect(data[2].airDate).toEqual(new Date('Friday Sep 25, 2015'));
+    });
 
   });
 
