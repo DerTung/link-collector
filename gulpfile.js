@@ -3,9 +3,12 @@ var gulp = require('gulp');
 var replace = require('gulp-replace');
 var insert = require('gulp-insert');
 var KarmaServer = require('karma').Server;
+var watchify = require('watchify');
 var browserify = require('browserify');
 var mustache = require('browserify-mustache');
 var source = require('vinyl-source-stream');
+var gutil = require('gutil');
+var del = require('del');
 
 var argv = minimist(process.argv.slice(2))
 
@@ -15,17 +18,14 @@ var paths = {
     'app/**/*.json',
     'app/**/*.html',
     'app/**/*.css',
-    'app/content/content.js',
-    'app/main/**/*.js'
+    'app/content/content.js'
   ],
-  staticBowerComponents: [
-    'bower_components/angular/angular.min.js',
-    'bower_components/angular/angular.min.js.map',
-    'bower_components/bootstrap/dist/**/*.*'
+  staticDependencies: [
+    'node_modules/bootstrap/dist/css/bootstrap.min.css'
   ],
   infoFiles: ['LICENSE', 'CHANGELOG'],
   browserify: ['app/**/*.js', 'app/**/*.mustache'],
-  versions: ['package.json', 'bower.json', 'app/manifest.json']
+  versions: ['package.json', 'app/manifest.json']
 }
 
 gulp.task('test', function (done) {
@@ -35,7 +35,7 @@ gulp.task('test', function (done) {
   }, done).start();
 });
 
-gulp.task('copy', function() {
+gulp.task('copyStatic', function() {
   return gulp.src(paths.staticFiles, {base: 'app'}).pipe(gulp.dest('build'));
 });
 
@@ -43,8 +43,12 @@ gulp.task('copyInfo', function() {
   return gulp.src(paths.infoFiles).pipe(gulp.dest('build'));
 });
 
-gulp.task('copyBowerComponents', function () {
-  return gulp.src(paths.staticBowerComponents, {base: './'}).pipe(gulp.dest('build'));
+gulp.task('copyDependencies', function () {
+  return gulp.src(paths.staticDependencies, {base: './node_modules'}).pipe(gulp.dest('build/vendor'));
+});
+
+gulp.task('clean', function () {
+  return del(['build']);
 });
 
 gulp.task('version', function() {
@@ -60,23 +64,68 @@ gulp.task('version', function() {
       .pipe(gulp.dest('.'));
 });
 
-gulp.task('browserify-background', function() {
-  return browserify('./app/background/background.js', {
+function createBundler(options) {
+  var b = browserify(options.entry, {
     insertGlobals : true,
     debug : true,
-    paths: ['./app/', './bower_components/'],    
-  }).bundle()
-    .pipe(source('background.js'))
-    .pipe(gulp.dest('./build/background'));
+    paths: options.paths,    
+  });
+  
+  if (options.watch) {
+    b = watchify(b);
+    b.on('update', bundle);
+    b.on('log', gutil.log); 
+  }
+  
+  function bundle() {
+    b.bundle()
+      //.on('error', gutil.log)
+      .on('error', function(e) {
+        gutil.log(e.message, e.filename);
+      })
+      .pipe(source(options.destFile))
+      .pipe(gulp.dest(options.destFolder));
+  }
+  return {bundle}
+}
+
+function createBackgroundBundler(watch) {
+  return createBundler({
+    entry: './app/background/background.js',
+    paths: ['./app/'],
+    destFile: 'background.js',
+    destFolder: './build/background',
+    watch
+  })
+}
+
+function createMainBundler(watch) {
+  return createBundler({
+    entry: './app/main/app.js',
+    paths: ['./app/'],
+    destFile: 'app.js',
+    destFolder: './build/main',
+    watch
+  })
+}
+
+gulp.task('browserify-background', function() {
+  return createBackgroundBundler(false).bundle();
+});
+
+gulp.task('browserify-main', function() {
+  return createMainBundler(false).bundle();
 });
 
 gulp.task('browserify', ['browserify-background']);
 
-gulp.task('watch', ['build'], function() {
-  gulp.watch(paths.staticFiles, ['copy']);
+gulp.task('watch', ['copy'], function() {
+  gulp.watch(paths.staticFiles, ['copyStatic']);
   gulp.watch(paths.infoFiles, ['copyInfo']);
-  gulp.watch(paths.browserify, ['browserify']);
+  createBackgroundBundler(true).bundle();
+  createMainBundler(true).bundle();
 });
 
 gulp.task('default', ['test', 'build']);
-gulp.task('build', ['copy', 'copyInfo', 'copyBowerComponents', 'browserify']);
+gulp.task('build', ['copy', 'browserify']);
+gulp.task('copy', ['copyStatic', 'copyInfo', 'copyDependencies']);
