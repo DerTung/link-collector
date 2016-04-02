@@ -2,16 +2,13 @@ function showList() {
   return {
     restrict: 'E',
     templateUrl: 'show-list.html',
-    controller:  function($scope, messageService, filterService) {
+    controller:  function($scope, Show, filterService) {
       var showCtrl = this;
       showCtrl.filterService = filterService;
-      try {
-        showCtrl.shows = JSON.parse(localStorage.showList);
-      } catch (e) {
-        showCtrl.shows = [];
-      }
+      showCtrl.shows = Show.allSorted();
       
       showCtrl.markDownloaded = function() {
+        shows.forEach(show => show.hasUnmarkedEpisodes = false);
         messageService.sendMessage({
           action: 'addDownloaded',
           shows: showCtrl.shows
@@ -26,14 +23,12 @@ function showList() {
         showCtrl.loaded = 0;
         showCtrl.total = showCtrl.shows.length;
         showCtrl.shows.forEach(function(show) {
-          messageService.sendMessage({action: 'loadShow', show: show}).then(function (data) {
-            if (loadId == _loadId) {
-              show.episodes = data.episodes;
-              show.error = data.error;
+          show.loadEpisodes().then(function (data) {
+            if (loadId === _loadId) {
               showCtrl.loaded++;
               showCtrl.episodeCount += show.episodes.length;
             }
-          })
+          });
         });
       }
       $scope.$watch(function () {

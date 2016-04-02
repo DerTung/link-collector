@@ -44,7 +44,7 @@ TopicScraper.prototype._analyzeMessage = function(message) {
     
     var airDate = this._getAirDateFromElement(element);
     if (airDate) {
-      this._getCurrentEpisode().airDate = airDate;
+      this._getCurrentEpisode().airDate = airDate.toDateString();
     }
 
     var file = File.fromElement(element);

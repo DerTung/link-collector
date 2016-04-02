@@ -14,7 +14,7 @@
       <ul ng-show="show.error"><li class="text-danger">{{ show.error }}</li></ul>
       <ul>
         <li ng-repeat="episode in show.episodes" class="episode">
-          s{{ episode.season }}e{{ episode.episode }}
+          s{{ episode.season }}e{{ episode.episode }} <small>{{ episode.airDate }}</small>
           <ul>
             <li ng-repeat="file in episode.files">
               <span class="file">{{ file.format }} | {{ file.codec }}</span>

@@ -10,7 +10,7 @@ function filterService($rootScope) {
     var lsKey = options[key];
     service[key] = localStorage.getItem(lsKey);
     $rootScope.$watch(function() {
-    return service[key];
+      return service[key];
     }, function() {
       localStorage.setItem(lsKey, service[key]);
     });
