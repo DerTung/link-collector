@@ -45,6 +45,7 @@ function ShowFactory(messageService) {
     static allSorted() {
       let shows = Show.all();
       shows.sort(Show.compare);
+      shows.reverse();
       return shows;
     }
     
@@ -53,19 +54,15 @@ function ShowFactory(messageService) {
       const daysPerWeek = 7;
       const fourWeeks = 28;
       
-      if (a.hasUnmarkedEpisodes && !b.hasUnmarkedEpisodes) {
-        return 1;
-      }
-      if (b.hasUnmarkedEpisodes && !a.hasUnmarkedEpisodes) {
-        return -1;
-      }
+      if (a.hasUnmarkedEpisodes && !b.hasUnmarkedEpisodes) return 1;
+      if (b.hasUnmarkedEpisodes && !a.hasUnmarkedEpisodes) return -1;
       
       let dateA = new Date(a.lastAired);
       let dateB = new Date(b.lastAired);
       
-      if (isNaN(dateA) && isNaN(dateB)) {
-        return 0;
-      }
+      if (isNaN(dateA) && isNaN(dateB)) return 0;
+      if (isNaN(dateA)) return -1;
+      if (isNaN(dateB)) return 1;
       
       let today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -90,9 +87,7 @@ function ShowFactory(messageService) {
       let weekDaysAgoA = daysAgoA % daysPerWeek;
       let weekDaysAgoB = daysAgoB % daysPerWeek; 
       
-      if (weekDaysAgoA == weekDaysAgoB) {
-        return 1;
-      }
+      if (weekDaysAgoA == weekDaysAgoB) return 1;
       return weekDaysAgoB - weekDaysAgoA;
     }
   }

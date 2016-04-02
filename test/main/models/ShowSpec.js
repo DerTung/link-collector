@@ -93,7 +93,7 @@ describe('Show', function() {
     });
     
     it('returns any date is better than none', function() {
-      let a = {lastAired: eightDaysAgo, hasUnmarkedEpisodes: true};
+      let a = {lastAired: eightDaysAgo};
       let b = {};
       expectIsGreater(a, b);
     });
