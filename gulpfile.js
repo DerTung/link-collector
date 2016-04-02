@@ -5,7 +5,6 @@ var insert = require('gulp-insert');
 var KarmaServer = require('karma').Server;
 var watchify = require('watchify');
 var browserify = require('browserify');
-var mustache = require('browserify-mustache');
 var source = require('vinyl-source-stream');
 var gutil = require('gutil');
 var del = require('del');
@@ -24,7 +23,6 @@ var paths = {
     'node_modules/bootstrap/dist/css/bootstrap.min.css'
   ],
   infoFiles: ['LICENSE', 'CHANGELOG'],
-  browserify: ['app/**/*.js', 'app/**/*.mustache'],
   versions: ['package.json', 'app/manifest.json']
 }
 
@@ -79,7 +77,6 @@ function createBundler(options) {
   
   function bundle() {
     b.bundle()
-      //.on('error', gutil.log)
       .on('error', function(e) {
         gutil.log(e.message, e.filename);
       })
@@ -117,7 +114,7 @@ gulp.task('browserify-main', function() {
   return createMainBundler(false).bundle();
 });
 
-gulp.task('browserify', ['browserify-background']);
+gulp.task('browserify', ['browserify-background', 'browserify-main']);
 
 gulp.task('watch', ['copy'], function() {
   gulp.watch(paths.staticFiles, ['copyStatic']);
