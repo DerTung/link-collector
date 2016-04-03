@@ -2,6 +2,8 @@ var minimist = require('minimist');
 var gulp = require('gulp');
 var replace = require('gulp-replace');
 var insert = require('gulp-insert');
+var zip = require('gulp-zip');
+var runSequence = require('run-sequence');
 var KarmaServer = require('karma').Server;
 var watchify = require('watchify');
 var browserify = require('browserify');
@@ -45,8 +47,16 @@ gulp.task('copyDependencies', function () {
   return gulp.src(paths.staticDependencies, {base: './node_modules'}).pipe(gulp.dest('build/vendor'));
 });
 
+gulp.task('copy', ['copyStatic', 'copyInfo', 'copyDependencies']);
+
 gulp.task('clean', function () {
   return del(['build']);
+});
+
+gulp.task('zip', function() {
+  return gulp.src('build/**/*')
+           .pipe(zip('linkCollector.zip'))
+           .pipe(gulp.dest('dist'));
 });
 
 gulp.task('version', function() {
@@ -76,7 +86,7 @@ function createBundler(options) {
   }
   
   function bundle() {
-    b.bundle()
+    return b.bundle()
       .on('error', function(e) {
         gutil.log(e.message, e.filename);
       })
@@ -123,6 +133,9 @@ gulp.task('watch', ['copy'], function() {
   createMainBundler(true).bundle();
 });
 
+gulp.task('build', function(callback) {
+  runSequence('clean', ['copy', 'browserify'], 'zip', callback);
+});
+
 gulp.task('default', ['test', 'build']);
-gulp.task('build', ['copy', 'browserify']);
-gulp.task('copy', ['copyStatic', 'copyInfo', 'copyDependencies']);
+
