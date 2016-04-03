@@ -2,13 +2,13 @@ function showList() {
   return {
     restrict: 'E',
     templateUrl: 'show-list.html',
-    controller:  function($scope, Show, filterService) {
+    controller:  function($scope, Show, messageService, filterService) {
       var showCtrl = this;
       showCtrl.filterService = filterService;
       showCtrl.shows = Show.allSorted();
       
       showCtrl.markDownloaded = function() {
-        shows.forEach(show => show.hasUnmarkedEpisodes = false);
+        showCtrl.shows.forEach(show => show.hasUnmarkedEpisodes = false);
         messageService.sendMessage({
           action: 'addDownloaded',
           shows: showCtrl.shows
